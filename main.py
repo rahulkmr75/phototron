@@ -12,7 +12,7 @@ import const
 import ballpos as bp
 import math
 import time
-#import botpos
+import botpos
 
 dropP=(0,0)
 
@@ -44,16 +44,18 @@ def main():
     ref=time.time()
 
     #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("test2.webm")
+    cap = cv2.VideoCapture("output.avi")
     while not rospy.is_shutdown():
     	u+=1
         #Get the frame
         ret, bgr = cap.read()
-        pub1 = rospy.Publisher('Line1Positions', Quaternion, queue_size=10)
-        pub2 = rospy.Publisher("Line2Positions", Quaternion, queue_size=10)        
+        if (ret==0):
+            break
+        '''pub1 = rospy.Publisher('Line1Positions', Quaternion, queue_size=10)
+        pub2 = rospy.Publisher("Line2Positions", Quaternion, queue_size=10)'''      
       	pub3 = rospy.Publisher("LED", Byte, queue_size=10)
       	pub4 = rospy.Publisher("table_ends", Quaternion, queue_size=1)
-      	#copying data to avoid lose of information
+      	#copying data to avoid loss of information
       	bgr2=np.copy(bgr)
       	bgr3=np.copy(bgr)
 
@@ -134,12 +136,16 @@ def main():
        	d1=bp.bonline2(centroid,vec1[1][0],vec1[1][1],vec1[0][0],vec1[0][1])
        	d2=bp.bonline2(centroid,vec2[1][0],vec2[1][1],vec2[0][0],vec2[0][1])
 
+        #drawing the two lines obtained
+        bgr=cv2.line(bgr,(vec2[1][0],vec2[1][1]),(vec2[0][0],vec2[0][1]),(0,0,255),2)
+        bgr=cv2.line(bgr,(vec1[1][0],vec1[1][1]),(vec1[0][0],vec1[0][1]),(0,0,255),2)
+
        	err1.append(d1)
        	err2.append(d2)
        	
      	err3.append(abs(d1-d2))
 
-        #the led thing
+       ''' #the led thing
         if (count<2):
         	if (stcst==1):
         		if(d1<const.th_ball_on_line or d2<const.th_ball_on_line):
@@ -152,17 +158,17 @@ def main():
         	if (abs(d1-d2)<const.th_ball_equidis):
         		stcst=1
         else:
-        	count=0
+        	count=0'''
         
-
+	'''
         #turning the led on
         if (st==1):
         	bgr=cv2.circle(bgr,(20,20),10,(255,0,0),-1)
        
         bgr=cv2.circle(bgr,dropP,10,(255,0,0),-1)
-        cv2.imshow('ball',bgr)
+        cv2.imshow('ball',bgr)'''
         
-        if cv2.waitKey(30) & 0xFF==ord('q'):
+        if cv2.waitKey(32) & 0xFF==ord('q'):
             break
         pub1.publish(Quaternion(vec1[0][0],vec1[0][1],vec1[1][0],vec1[1][1]))
         #pub2.publish(Quaternion(x3,y1,x4,y2))

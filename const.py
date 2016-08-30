@@ -9,8 +9,8 @@ LOWline=np.array([80,100,105])
 UPline=np.array([150,255,255])
 
 #thresh values for the ball
-LOWball=np.array([0,100,150])
-UPball=np.array([35,255,255])
+LOWball=np.array(([0,100,150],[],[],[]))
+UPball=np.array(([35,255,255],[],[],[]))
 
 #thresh value for the bot
 LOWbot=np.array([45,100,75])

@@ -10,7 +10,7 @@ import const
 import math
 
 
-def ballp(frame):
+def ballp(frame,ball_no):
     #Get the frame
 
     pub = rospy.Publisher("ballPositions", Point, queue_size=10)
@@ -22,7 +22,7 @@ def ballp(frame):
 
 
     #Threshold the hue image to get the ball.
-    ball = cv2.inRange(hsv,const.LOWball,const.UPball)
+    ball = cv2.inRange(hsv,const.LOWball[ball_no],const.UPball[ball_no])
 
     #erode to reduce noise
     kernel = np.ones((5,5),np.uint8)
@@ -60,19 +60,3 @@ def ballp(frame):
     
     pub.publish(centroid)
     return centroid;
-
-def bonline(vec,vx,vy,x,y):
-    bx=vec.x
-    by=vec.y
-    d1=abs((vx*(by-y)-vy*(bx-x)))
-    d2=math.sqrt(vx*vx+vy*vy)
-    d=d1/d2
-    return (d)
-
-def bonline2(vec,x1,y1,x2,y2):
-    bx=vec.x
-    by=vec.y
-    d1=abs((by-y1)*(x2-x1)+(y1-y2)*(bx-x1))
-    d2=math.sqrt((x2-x1)**2+(y1-y2)**2)
-    d=d1/d2
-    return d
