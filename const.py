@@ -5,12 +5,12 @@ from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
 
 #thresh values for the line
-LOWline=np.array([80,100,105])
-UPline=np.array([150,255,255])
+LOWtable=np.array([80,100,105])
+UPtable=np.array([150,255,255])
 
 #thresh values for the ball
-LOWball=np.array(([0,100,150],[],[],[]))
-UPball=np.array(([35,255,255],[],[],[]))
+LOWball=np.array(([0,100,150],[0,0,0],[0,0,0],[0,0,0]))
+UPball=np.array(([35,255,255],[0,0,0],[0,0,0],[0,0,0]))
 
 #thresh value for the bot
 LOWbot=np.array([45,100,75])
@@ -22,4 +22,6 @@ th_ball_on_line=15
 th_ball_equidis=15
 
 #thresharea for filtering contours
-threshArea = 500
+threshArea = 50
+
+kp=8

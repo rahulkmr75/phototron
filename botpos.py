@@ -31,6 +31,6 @@ def findbot(frame):
 	    centroid_x = int(moments['m10']/m00)
 	    centroid_y = int(moments['m01']/m00)
 	if centroid_x != None and centroid_y != None:
-		return (centroid_x, centroid_y)
+		return Point(centroid_x, centroid_y,0)
 	else:
 		return (-1,-1)

@@ -13,87 +13,72 @@ import ballpos as bp
 import math
 import time
 import botpos
+import pid_control
 
-dropP=(0,0)
-
-
+dropP=Point(-1,-1,0)
+ball_no=0
 def main():
     centroid=Point(0,0,0)
-    rospy.init_node("LinePositions")
-    rospy.Subscriber("dropPoint", Point, dropPointLocator)
+    rospy.init_node("main")
+    #rospy.Subscriber("dropPoint", Point, dropPointLocator)
     
-   #defining a reference time
+    #defining a reference time
     ref=time.time()
 
     #cap = cv2.VideoCapture(0)
     cap = cv2.VideoCapture("output.avi")
     while not rospy.is_shutdown():
-    	u+=1
         #Get the frame
         ret, bgr = cap.read()
         if (ret==0):
             break
 
-      	pub4 = rospy.Publisher("table_ends", Quaternion, queue_size=1)
+
       	#copying data to avoid loss of information
       	bgr2=np.copy(bgr)
       	bgr3=np.copy(bgr)
 
-      	#bot = botpos.findbot(bgr3)
+      	bot = botpos.findbot(bgr3)
 
       	#getting the ball position
-      	centroid=bp.ballp(bgr2)
+      	centroid=bp.ballp(bgr2,ball_no)
 
-        gray=cv2.cvtColor(bgr,cv2.COLOR_BGR2GRAY)
+        #gray=cv2.cvtColor(bgr,cv2.COLOR_BGR2GRAY)
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
         #b,g,r = cv2.split(bgr)
-        h,s,v = cv2.split(hsv)
+        #h,s,v = cv2.split(hsv)
 
         #Threshold the hue image to get the ball.
         #line = cv2.inRange(hsv,const.LOW,constUP)
 
 
-        gline=cv2.inRange(hsv,const.LOWline,const.UPline)
-        gline=cv2.GaussianBlur(gline,(5,5),0)
-        gline=cv2.GaussianBlur(gline,(5,5),0)
-        gline=cv2.GaussianBlur(gline,(5,5),0)
+        gline=cv2.inRange(hsv,const.LOWtable,const.UPtable)
+        gline=cv2.GaussianBlur(gline,(15,15),0)
+        gline=cv2.GaussianBlur(gline,(15,15),0)
+        gline=cv2.GaussianBlur(gline,(15,15),0)
         # ret, gline = cv2.threshold(gline,100,255,cv2.THRESH_BINARY)
         ret, gline = cv2.threshold(gline,-1,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+	dropPointLocator(centroid,bot)
 
-        #cv2.imshow("line",gline)
-       
+
+        bgr=cv2.circle(bgr,(int(dropP.x),int(dropP.y)),10,(255,0,0),-1)
+        bgr=cv2.circle(bgr,(centroid.x,centroid.y),10,(0,255,0),-1)
+        bgr=cv2.circle(bgr,(bot.x,bot.y),10,(0,0,255),-1)
         
-        img,temp,hierarchy = cv2.findContours(gline, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-
-        rows,cols=bgr.shape[:2]
-        y1=0
-        y2=rows-1
-
-        #calculate the end points of the table
-        #topmost returns the topmost point in (x,y)
-    	if(count2==0):
-	        for j in contours:
-	        	topmost = tuple(j[j[:,:,1].argmin()][0])
-        		bottommost = tuple(j[j[:,:,1].argmax()][0])
-        		ends.append([topmost[1],bottommost[1]])
-        	count2+=1
-        table_ends=Quaternion(ends[0][0],ends[0][1],ends[1][0],ends[1][1])
-        pub4.publish(table_ends)
-
+	pid_control.move(dropP.x,dropP.y,bot.x,bot.y)
+	
+	cv2.imshow("main",bgr)
+        
         if cv2.waitKey(32) & 0xFF==ord('q'):
             break
 
-        pub3.publish(st)	
-
-        print "No of frames till now is %d " %u
     # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
 
-def dropPointLocator(point):
+def dropPointLocator(point_ball,point_bot):
 	global dropP
-	dropP=(int(point.x),int(point.y))
+	dropP=Point(int(point_bot.x),int(point_ball.y),0)
 
 #IF __main__ RUN THE MAIN FUNCTION. THIS IS THE MAIN THREAD
 if __name__ == '__main__':
