@@ -24,4 +24,4 @@ th_ball_equidis=15
 #thresharea for filtering contours
 threshArea = 50
 
-kp=8
+kp=1

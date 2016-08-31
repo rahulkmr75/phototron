@@ -17,6 +17,8 @@ tim=[]
 def move(x_drop,y_drop,x_bot,y_bot):
 	d=math.sqrt((x_bot-x_drop)**2+(y_drop-y_bot)**2)
         u=const.kp*d
+	if(x_drop==-1 or x_bot==-1):
+		u=0
 	#err.append(d)
 	'''if (len(tim)==0):
 		tim.append(ref)
@@ -35,6 +37,6 @@ def move(x_drop,y_drop,x_bot,y_bot):
 	else:
 		di=0
 
-	return (u,di)
+	return Point(u,di,d)
 
 	

@@ -33,4 +33,4 @@ def findbot(frame):
 	if centroid_x != None and centroid_y != None:
 		return Point(centroid_x, centroid_y,0)
 	else:
-		return (-1,-1)
+		return Point(-1,-1,0)

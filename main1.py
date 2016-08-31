@@ -19,6 +19,9 @@ dropP=Point(-1,-1,0)
 ball_no=0
 def main():
     centroid=Point(0,0,0)
+    #the motor vel publisher
+    pub=rospy.Publisher("motor_vel", Point, queue_size=10)
+
     rospy.init_node("main")
     #rospy.Subscriber("dropPoint", Point, dropPointLocator)
     
@@ -64,9 +67,11 @@ def main():
         bgr=cv2.circle(bgr,(int(dropP.x),int(dropP.y)),10,(255,0,0),-1)
         bgr=cv2.circle(bgr,(centroid.x,centroid.y),10,(0,255,0),-1)
         bgr=cv2.circle(bgr,(bot.x,bot.y),10,(0,0,255),-1)
-        
-	pid_control.move(dropP.x,dropP.y,bot.x,bot.y)
-	
+         
+	#getting motor velocity and publishing it
+	vel_data=pid_control.move(dropP.x,dropP.y,bot.x,bot.y)
+	pub.publish(vel_data)
+		
 	cv2.imshow("main",bgr)
         
         if cv2.waitKey(32) & 0xFF==ord('q'):
