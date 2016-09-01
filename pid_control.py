@@ -14,8 +14,14 @@ tim=[]
 def move(x_drop,y_drop,x_bot,y_bot):
 	d=math.sqrt((x_bot-x_drop)**2+(y_drop-y_bot)**2)
         u=const.kp*d
-	if(x_drop==-1 or x_bot==-1):
+	print d
+
+	if(d<15):
 		u=0
+	elif(d<50 and d>=15):
+		u=int(math.tan(0.0523*d)*61)	
+	else:
+		u=150
 	#err.append(d)
 	'''if (len(tim)==0):
 		tim.append(ref)
@@ -27,6 +33,8 @@ def move(x_drop,y_drop,x_bot,y_bot):
 	u=err[len(err)-1]+integral
 	print (d,integral)
 	'''
+	if(x_drop==-1 or x_bot==-1 or y_drop==-1 or y_bot==-1):
+		u=0
 	if (y_drop>y_bot):
 		di=1
 	elif (y_drop<y_bot):

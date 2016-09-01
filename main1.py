@@ -26,8 +26,8 @@ def main():
     #defining a reference time
     ref=time.time()
 
-    #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("test1.webm")
+    cap = cv2.VideoCapture(1)
+    #cap = cv2.VideoCapture("output.avi")
     
     while not rospy.is_shutdown():
         #Get the frame
