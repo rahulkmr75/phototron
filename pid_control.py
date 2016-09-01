@@ -2,11 +2,8 @@
 #HANDLE IMPORTS
 import numpy as np
 import math
-from collections import deque
-from sklearn import linear_model
 import rospy
 from geometry_msgs.msg import Point
-from geometry_msgs.msg import Quaternion
 import time
 import cv2
 import const
@@ -37,6 +34,6 @@ def move(x_drop,y_drop,x_bot,y_bot):
 	else:
 		di=0
 
-	return Point(u,di,d)
+	return Point(u,di,0)
 
 	

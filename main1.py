@@ -6,8 +6,6 @@ import numpy as np;
 import rospy
 from matplotlib import pyplot as plt
 from geometry_msgs.msg import Point
-from geometry_msgs.msg import Quaternion
-from std_msgs.msg import Byte
 import const
 import ballpos as bp
 import math
@@ -18,18 +16,19 @@ import pid_control
 dropP=Point(-1,-1,0)
 ball_no=0
 def main():
-    centroid=Point(0,0,0)
+    ball=Point(0,0,0)
+
     #the motor vel publisher
     pub=rospy.Publisher("motor_vel", Point, queue_size=10)
 
     rospy.init_node("main")
-    #rospy.Subscriber("dropPoint", Point, dropPointLocator)
     
     #defining a reference time
     ref=time.time()
 
     #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("output.avi")
+    cap = cv2.VideoCapture("test1.webm")
+    
     while not rospy.is_shutdown():
         #Get the frame
         ret, bgr = cap.read()
@@ -44,7 +43,7 @@ def main():
       	bot = botpos.findbot(bgr3)
 
       	#getting the ball position
-      	centroid=bp.ballp(bgr2,ball_no)
+      	ball=bp.ballp(bgr2,ball_no)
 
         #gray=cv2.cvtColor(bgr,cv2.COLOR_BGR2GRAY)
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
@@ -55,27 +54,28 @@ def main():
         #line = cv2.inRange(hsv,const.LOW,constUP)
 
 
-        gline=cv2.inRange(hsv,const.LOWtable,const.UPtable)
-        gline=cv2.GaussianBlur(gline,(15,15),0)
-        gline=cv2.GaussianBlur(gline,(15,15),0)
-        gline=cv2.GaussianBlur(gline,(15,15),0)
-        # ret, gline = cv2.threshold(gline,100,255,cv2.THRESH_BINARY)
-        ret, gline = cv2.threshold(gline,-1,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-	dropPointLocator(centroid,bot)
+        table=cv2.inRange(hsv,const.LOWtable,const.UPtable)
+        table=cv2.GaussianBlur(table,(15,15),0)
+        table=cv2.GaussianBlur(table,(15,15),0)
+        table=cv2.GaussianBlur(table,(15,15),0)
+        # ret, table = cv2.threshold(table,100,255,cv2.THRESH_BINARY)
+        ret, table = cv2.threshold(table,-1,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
+        # Find the coordinates of the drop position
+        dropPointLocator(ball,bot)
 
         bgr=cv2.circle(bgr,(int(dropP.x),int(dropP.y)),10,(255,0,0),-1)
-        bgr=cv2.circle(bgr,(centroid.x,centroid.y),10,(0,255,0),-1)
+        bgr=cv2.circle(bgr,(ball.x,ball.y),10,(255,0,0),-1)
         bgr=cv2.circle(bgr,(bot.x,bot.y),10,(0,0,255),-1)
-         
-	#getting motor velocity and publishing it
-	vel_data=pid_control.move(dropP.x,dropP.y,bot.x,bot.y)
-	pub.publish(vel_data)
-		
-	cv2.imshow("main",bgr)
-        
+
+        #getting motor velocity and publishing it
+        vel_data=pid_control.move(dropP.x,dropP.y,bot.x,bot.y)
+        pub.publish(vel_data)
+
+        cv2.imshow("main",bgr)
+
         if cv2.waitKey(32) & 0xFF==ord('q'):
-            break
+        	break
 
     # When everything done, release the capture
     cap.release()
